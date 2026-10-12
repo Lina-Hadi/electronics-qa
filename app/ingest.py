@@ -21,8 +21,8 @@ def ingest(pdf_path):
     chunks = chunck_text(extract_text(pdf_path))
     embeddings = model.encode(chunks).tolist()
     collection.add(
-        ids = f"{pdf_path}-{i}" for i in range(len(chunks)),
+        ids = [f"{pdf_path}-{i}" for i in range(len(chunks))],
         documents= chunks,
         embeddings= embeddings,
-        metadatas= [{"source": pdf_path, "chunk: i"} for i in range(len(chunks))]
+        metadatas= [{"source": pdf_path, "chunk": i} for i in range(len(chunks))]
     )
