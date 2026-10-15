@@ -1,6 +1,7 @@
 from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
 import chromadb
+from collections import Counter
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 db = chromadb.PersistentClient(path="chromadb")
@@ -26,3 +27,18 @@ def ingest(pdf_path):
         embeddings= embeddings,
         metadatas= [{"source": pdf_path, "chunk": i} for i in range(len(chunks))]
     )
+
+
+pdf_list = ["../data/all.pdf",
+            "../data/Electronics for Dummies.pdf",
+            "../data/make-electronics-excerpt.pdf",
+            "../data/RP-008307-DS-2-pico-datasheet.pdf",
+            "../data/SIK_v4_Book_Oct_25_FINAL.pdf"
+            ]
+
+
+for file in pdf_list:
+    ingest(file)
+
+data = collection.get(include=["metadatas"])
+print(Counter(m["source"] for m in data["metadatas"]))

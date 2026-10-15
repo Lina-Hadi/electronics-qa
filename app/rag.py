@@ -1,5 +1,18 @@
 import os
+from pyexpat import model
 from openai import OpenAI
+from ingest import model, collection
+from dotenv import load_dotenv
+
+
+load_dotenv()
+client = OpenAI(
+
+    api_key=os.getenv("GEMINI_API_KEY"),
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+)
+MODEL = "gemini-3-flash-preview"
+
 
 def  retrieve(question, k=4):
     q_emb = model.encode([question]).tolist()
@@ -11,7 +24,11 @@ def  retrieve(question, k=4):
 def answer(question):
     chunks = retrieve(question)
     context = "\n---\n".join(chunks)
-    prompt = f"""Answer the question based on the context below. If the question can't be answered based on the context, say "I don't know"
+    prompt = f"""You are a helpful electronics tutor for a beginner.
+Use the context below to answer the question. Base your answer on the context.
+
+- If the context fully answers the question, answer clearly.
+- If it answers only part, give that part and say what is missing.
 
 Context:
 {context}
@@ -33,6 +50,7 @@ Question: {question}"""
     }
     return text, chunks, usage
 
-text, chunks, usage = answer("How much SRAM does the RP2040 have?")
+text, chunks, usage = answer("How do I get started with the electronics kit?")
 print(text)
 print(usage)
+print(collection.count())
