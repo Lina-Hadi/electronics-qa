@@ -1,25 +1,30 @@
 from fastapi import FastAPI
-from rag import answer
-import streamlit as st
-from google import genai
+from pydantic import BaseModel
+from app.rag import answer
+from app.ingest import collection
 
 app = FastAPI()
 
+class Question(BaseModel):
+    text: str
+
 @app.post("/ask")
-async def ask_question(question: str):
-    return answer(question)
+async def ask_question(question: Question):
+    if not question.text.strip():
+        return {"error": "Question is empty."}
+    try:
+        text, chunks, usage = answer(question.text)
+        return {
+            "answer": text,
+            "sources": chunks,
+            "usage": usage
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
-st.set_page_config(page_title="Electronics QA", page_icon=":robot_face:", layout="centered")
-st.title("Electronics QA")
+    return {"answer": text, "sources": chunks, "usage": usage}
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+@app.get("/count")
+async def get_count():
+    return {"Chunks stored": collection.count()}
 
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
-if prompt := st.chat_input("What do you wanna know about electronics?"):
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    st.session_state.messages.append({"role": "user", "content": prompt})

@@ -1,5 +1,4 @@
 import os
-from pyexpat import model
 from openai import OpenAI
 from ingest import model, collection
 from dotenv import load_dotenv
@@ -15,7 +14,7 @@ client = OpenAI(
 MODEL = "gemini-3-flash-preview"
 
 
-def  retrieve(question, k=4):
+def  retrieve(question, k=6):
     q_emb = model.encode([question]).tolist()
     result = collection.query(
         query_embeddings=q_emb,
@@ -26,7 +25,7 @@ def answer(question):
     chunks = retrieve(question)
     context = "\n---\n".join(chunks)
     prompt = f"""You are a helpful electronics tutor for a beginner.
-Use the context below to answer the question. Base your answer on the context.
+Use the context below to answer the question. Base your answer on the context and do not add facts that are not in the context..
 
 - If the context fully answers the question, answer clearly.
 - If it answers only part, give that part and say what is missing.
@@ -51,7 +50,7 @@ Question: {question}"""
     }
     return text, chunks, usage
 
-text, chunks, usage = answer("How do I get started with the electronics kit?")
+text, chunks, usage = answer("What does an electronics usually consist of?")
 print(text)
 print(usage)
 print(collection.count())
