@@ -1,10 +1,14 @@
+import os
 from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
 import chromadb
 from collections import Counter
+from dotenv import load_dotenv
+
+load_dotenv()
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
-db = chromadb.PersistentClient(path="chromadb")
+db = chromadb.PersistentClient(path=os.getenv("CHROMADB_PATH"))
 collection = db.get_or_create_collection("docs")
 
 def extract_text(pdf_path):

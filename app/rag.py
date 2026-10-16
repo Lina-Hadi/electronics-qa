@@ -1,6 +1,6 @@
 import os
 from openai import OpenAI
-from ingest import model, collection
+from app.ingest import model, collection
 from dotenv import load_dotenv
 
 
