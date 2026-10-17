@@ -33,12 +33,7 @@ def ingest(pdf_path):
     )
 
 
-pdf_list = ["../data/all.pdf",
-            "../data/Electronics for Dummies.pdf",
-            "../data/make-electronics-excerpt.pdf",
-            "../data/RP-008307-DS-2-pico-datasheet.pdf",
-            "../data/SIK_v4_Book_Oct_25_FINAL.pdf"
-            ]
+pdf_list = [os.getenv(f"PDFPATH{i}") for i in range(1, 6) if os.getenv(f"PDFPATH{i}")]
 
 
 for file in pdf_list:

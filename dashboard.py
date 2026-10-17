@@ -1,12 +1,15 @@
 import streamlit as st
 from google import genai
 import requests
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
+api_url = os.getenv("API_URL")
 
 def ask_api(question):
-    response = requests.post(f"{os.getenv('API_URL')}/ask", json={"text": question})
+
+    response = requests.post(f"{api_url}/ask", json={"text": question})
     response.raise_for_status()
     data = response.json()
     return data["answer"], data["sources"], data["usage"]
@@ -22,7 +25,6 @@ def show_sources(chunks):
     for c in chunks:
         st.markdown(f"**{c['source']}**")
         st.write(c['text'])
-        st.data_editor
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):

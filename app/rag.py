@@ -19,11 +19,16 @@ def  retrieve(question, k=6):
     result = collection.query(
         query_embeddings=q_emb,
         n_results=k)
-    return result['documents'][0]
+    docs = result["documents"][0]
+    metas = result["metadatas"][0]
+    return [
+        {"text": d, "source": (m or {}).get("source", "unknown")}
+        for d, m in zip(docs, metas)
+    ]
 
 def answer(question):
     chunks = retrieve(question)
-    context = "\n---\n".join(chunks)
+    context = "\n---\n".join(c["text"] for c in chunks)
     prompt = f"""You are a helpful electronics tutor for a beginner.
 Use the context below to answer the question. Base your answer on the context and do not add facts that are not in the context..
 
@@ -50,7 +55,7 @@ Question: {question}"""
     }
     return text, chunks, usage
 
-text, chunks, usage = answer("What does an electronics usually consist of?")
-print(text)
-print(usage)
-print(collection.count())
+#text, chunks, usage = answer("What does an electronics usually consist of?")
+#print(text)
+#print(usage)
+#print(collection.count())
